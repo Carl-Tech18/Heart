@@ -36,12 +36,12 @@ html, body {
   left: 50%;
   transform: translate(-50%, -50%);
   width: 100vw;
-  color: #fff;
+  color: #00;
   font-family: sans-serif;
   z-index: 3;
   pointer-events: none;
   text-shadow: 1px 1px 4px #0008;
-  font-size: 1.1rem;
+  font-size: 5rem;
   user-select: none;
 
   display: flex;
@@ -52,15 +52,16 @@ html, body {
 }
 
 #typewriter {
-  font-size: 1.5em;
+  font-size: 5em;
+  color: #00;
   margin: 12px 0 5px 0;
   min-height: 2em;
 }
 #love-message {
   display: block;
-  font-size: 1.1em;
+  font-size: 5em;
   margin-top: 6px;
-  color: #ffd6e0;
+  color: #00;
 }
 
 canvas {
