@@ -1,6 +1,29 @@
-body {
+html, body {
   margin: 0;
-  background: #fff0f5;
-  overflow-x: hidden;
-  font-family: 'Segoe UI', sans-serif;
+  padding: 0;
+  overflow: hidden;
+  background: #18121e;
+  width: 100vw;
+  height: 100vh;
+}
+
+#info {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  width: 100vw;
+  text-align: center;
+  color: #fff;
+  font-family: sans-serif;
+  z-index: 2;
+  pointer-events: none;
+  text-shadow: 1px 1px 4px #0008;
+  font-size: 1.1rem;
+  user-select: none;
+}
+
+canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
 }
