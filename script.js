@@ -26,18 +26,4 @@ setInterval(() => {
   heart.className = 'falling-heart';
   heart.innerHTML = '❤️';
   heart.style.left = Math.random() * 100 + 'vw';
-  heart.style.fontSize = `${Math.random() * 20 + 20}px`;
-  document.body.appendChild(heart);
-  setTimeout(() => heart.remove(), 6000);
-}, 300);
-
-// Heart trail cursor effect
-document.addEventListener('mousemove', (e) => {
-  const trail = document.createElement('div');
-  trail.className = 'heart-trail';
-  trail.innerHTML = '❤️';
-  trail.style.left = `${e.pageX}px`;
-  trail.style.top = `${e.pageY}px`;
-  document.body.appendChild(trail);
-  setTimeout(() => trail.remove(), 1000);
-});
+  heart.style.fontSize = `${Math.random() * 20 + 2*
