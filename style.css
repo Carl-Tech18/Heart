@@ -2,9 +2,32 @@ html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background: #18121e;
   width: 100vw;
   height: 100vh;
+  position: relative;
+}
+
+#gradient-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  animation: gradientMove 12s infinite linear alternate;
+  background: linear-gradient(120deg, #ff8ecf 0%, #ffd6e0 25%, #fff1f7 60%, #e8eaf6 100%);
+  background-size: 200% 200%;
+  opacity: 0.8;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0 0; }
+  100% { background-position: 100% 100%; }
+}
+
+#background-hearts {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  z-index: 1;
+  pointer-events: none;
 }
 
 #info {
@@ -15,15 +38,30 @@ html, body {
   text-align: center;
   color: #fff;
   font-family: sans-serif;
-  z-index: 2;
+  z-index: 3;
   pointer-events: none;
   text-shadow: 1px 1px 4px #0008;
   font-size: 1.1rem;
   user-select: none;
 }
 
+#typewriter {
+  font-size: 1.5em;
+  margin: 12px 0 5px 0;
+  min-height: 2em;
+}
+#love-message {
+  display: block;
+  font-size: 1.1em;
+  margin-top: 6px;
+  color: #ffd6e0;
+}
+
 canvas {
   display: block;
   width: 100vw;
   height: 100vh;
-}
+  z-index: 2;
+  position: absolute;
+  top: 0; left: 0;
+  }
