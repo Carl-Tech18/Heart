@@ -1,71 +1,125 @@
-const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(
-    75,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    2000
-  );
-  camera.position.z = 500;
+// ====== CONFIG ======
+const PARTICLE_COUNT = 5000;
+const HEART_SCALE = 16;
+const Z_VOLUME = 18;
+const GLOW_SIZE = 18;
+const MORPH_SPEED = 0.32;
+const FADE_SPEED = 0.9;
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
+// ====== GLOW TEXTURE ======
+const glowDataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAVFBMVEUAAABGRkZGSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkqY4M8AAAAF3RSTlMAAAAAAAIDBAUGBwgJCgsMDxAUFxcYGRobH5Gk5QAAAG1JREFUGJVjYMAJZGBhYmRgYWFiZGBgYGBgYmJgYGBgZGJgYGBgYGBgYGJhYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGJgYGBgYGBgYGBgYGBgYGJiYGBgYGJgYGBgYGJgYGBgYGBgYGBgYGBgYGJgYGBgYGJgYGBgYGAAAwC4dR8O+8I5cAAAAABJRU5ErkJggg==";
+
+// ====== HEART FORMULA ======
+function heart3D(t, s = HEART_SCALE) {
+  const phi = t * 2 * Math.PI;
+  const x = 16 * Math.pow(Math.sin(phi), 3);
+  const y = 13 * Math.cos(phi) - 5 * Math.cos(2 * phi) - 2 * Math.cos(3 * phi) - Math.cos(4 * phi);
+  return { x: x * s, y: -y * s, z: 0 };
+}
+
+// ====== SCENE SETUP ======
+let scene, camera, renderer, particles = [];
+let targets = [], starts = [];
+let progress = 0, morphing = true;
+
+function createScene() {
+  scene = new THREE.Scene();
+  const w = window.innerWidth, h = window.innerHeight;
+  camera = new THREE.PerspectiveCamera(60, w / h, 20, 4000);
+  camera.position.set(0, 0, 1550);
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setClearColor(0x18121e, 1);
+  renderer.setSize(w, h);
   document.body.appendChild(renderer.domElement);
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
+}
 
-  // Heart shape math
-  function heartShape(t) {
-    const x = 16 * Math.pow(Math.sin(t), 3);
-    const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
-    return new THREE.Vector3(x * 10, y * 10, 0);
+// ====== PARTICLES ======
+function createParticles() {
+  for (let p of particles) scene.remove(p);
+  particles = [], targets = [], starts = [];
+
+  const tex = new THREE.TextureLoader().load(glowDataUrl);
+
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const t = Math.random();
+    const base = heart3D(t);
+    const z = (Math.random() - 0.5) * Z_VOLUME;
+    targets.push({ x: base.x, y: base.y, z });
+
+    starts.push({
+      x: (Math.random() - 0.5) * 2000,
+      y: (Math.random() - 0.5) * 1600,
+      z: (Math.random() - 0.5) * 1200
+    });
+
+    const mat = new THREE.SpriteMaterial({
+      map: tex,
+      color: 0xff3579,
+      transparent: true,
+      opacity: 0
+    });
+    const sprite = new THREE.Sprite(mat);
+    sprite.scale.set(GLOW_SIZE, GLOW_SIZE, 1);
+    scene.add(sprite);
+    particles.push(sprite);
   }
+}
 
-  const total = 1000;
-  const geometry = new THREE.BufferGeometry();
-  const positions = new Float32Array(total * 3);
-  const targets = new Float32Array(total * 3);
+// ====== MORPH LOGIC ======
+function easeOutQuad(t) {
+  return t * (2 - t);
+}
 
-  for (let i = 0; i < total; i++) {
-    const i3 = i * 3;
-    positions[i3] = (Math.random() - 0.5) * 2000;
-    positions[i3 + 1] = (Math.random() - 0.5) * 2000;
-    positions[i3 + 2] = (Math.random() - 0.5) * 2000;
+function updateParticles() {
+  const eased = easeOutQuad(progress);
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const s = starts[i], t = targets[i], p = particles[i];
+    p.position.x = s.x + (t.x - s.x) * eased;
+    p.position.y = s.y + (t.y - s.y) * eased;
+    p.position.z = s.z + (t.z - s.z) * eased;
 
-    const t = Math.random() * Math.PI * 2;
-    const p = heartShape(t);
-    targets[i3] = p.x;
-    targets[i3 + 1] = p.y;
-    targets[i3 + 2] = p.z;
+    let targetOpacity = Math.min(1, eased * 1.2);
+    p.material.opacity += (targetOpacity - p.material.opacity) * FADE_SPEED;
   }
+}
 
-  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-
-  const material = new THREE.PointsMaterial({
-    color: 0xff3399,
-    size: 2,
-    transparent: true,
-    opacity: 0.8,
-  });
-
-  const points = new THREE.Points(geometry, material);
-  scene.add(points);
-
-  const posAttr = geometry.attributes.position;
-
-  function animate() {
-    requestAnimationFrame(animate);
-
-    for (let i = 0; i < total * 3; i++) {
-      posAttr.array[i] += (targets[i] - posAttr.array[i]) * 0.02;
+// ====== RENDER LOOP ======
+function animate() {
+  if (morphing) {
+    progress += MORPH_SPEED * 0.008;
+    if (progress >= 1) {
+      morphing = false;
+      progress = 1;
     }
-
-    posAttr.needsUpdate = true;
-    points.rotation.y += 0.002;
-
-    renderer.render(scene, camera);
   }
+  updateParticles();
+  renderer.render(scene, camera);
+  requestAnimationFrame(animate);
+}
 
-  animate();
+// ====== RESIZE ======
+function onResize() {
+  const w = window.innerWidth, h = window.innerHeight;
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+}
+window.addEventListener('resize', onResize);
+
+// ====== CLICK TO RESHUFFLE ======
+function reshuffle() {
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    starts[i].x = (Math.random() - 0.5) * 2000;
+    starts[i].y = (Math.random() - 0.5) * 1600;
+    starts[i].z = (Math.random() - 0.5) * 1200;
+    particles[i].material.opacity = 0;
+  }
+  progress = 0;
+  morphing = true;
+}
+window.addEventListener('click', reshuffle);
+
+// ====== MAIN ======
+createScene();
+createParticles();
+animate();
