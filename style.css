@@ -16,6 +16,16 @@ h2#greeting {
   font-size: 70px;
   margin-top: 20px;
   cursor: pointer;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
 }
 
 #love-message {
