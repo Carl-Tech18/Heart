@@ -53,7 +53,6 @@ function createParticles() {
     });
 
     const mat = new THREE.SpriteMaterial({
-      map: tex,
       color: 0xff3579,
       transparent: true,
       opacity: 0
@@ -108,6 +107,7 @@ window.addEventListener('resize', onResize);
 
 // ====== CLICK TO RESHUFFLE ======
 function reshuffle() {
+  console.log('Click detected! Reshuffling...');
   for (let i = 0; i < PARTICLE_COUNT; i++) {
     starts[i].x = (Math.random() - 0.5) * 2000;
     starts[i].y = (Math.random() - 0.5) * 1600;
