@@ -79,14 +79,14 @@ window.addEventListener('resize', () => {
 });
 animateClickTrails();
 
-// ====== 4. Auto-rotation ======
+// ====== 4. Auo-rotaton ======
 let autoRotate = true;
 let rotationY = 0;
 
 // ====== 6. Gradient background is in CSS ======
 
 // ====== 7. Typewriter effect ======
-const typewriterText = "Click anywhere to reshuffle the heart!";
+const typewriterText = "";
 const typewriterDiv = document.getElementById('typewriter');
 let twIdx = 0;
 function typewriter() {
